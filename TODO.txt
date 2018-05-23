@@ -1,0 +1,28 @@
+Current major issues to address:
+	FILTER: SIFT is performing sub-optimally (both in time and accuracy)
+	FILTER: SIFT has a potential divide-by-zero
+    FILTER: SIFT has some very very minor seem effects, possibly due ot the MATLAB compat mode
+	FILTER: correlate_xy (used by Edge, Frangi, and eventually SIFT) currently can't do multithreaded in-place
+			it is possible that pyfftw would be better than correlate_xy anyways
+
+Still True?
+	TRAIN:	using non-compat SIFT filters causes issues
+	FILTER: higher levels have much-reduced accuracy compared to MATLAB
+			even inten - thus does MyDownSample have issues?
+
+Current planned optimizations:
+	TEST:	when doing a tile-subset only copy the surrounding region into shared memory
+			also, only downsample that region
+	TEST:	deadlock on leaving first parallel block when re-running CHM-test in same process
+	FILTER:	optimize SIFT more
+	UTIL:	optimize/multi-thread compress and/or im2double
+	FILTER/TEST/TRAIN: see if any algorithms would benefit from being made into CUDA vareties
+			primary targets: Gabor, SIFT, HOG, Frangi, LDNN-train, LDNN-test
+
+Minor optimizations that could be done:
+	TEST:	give each process a different number of threads when nthreads is fractional
+	TRAIN:	save histogram?
+	TRAIN:	subsample?
+	TRAIN:	how should masks be downsampled?
+	FILTER:	Haar cc_cmp_II in place?
+	FILTER:	Edge one less intermediate?

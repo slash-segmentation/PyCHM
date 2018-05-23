@@ -1,0 +1,5 @@
+
+recursive-include chm *.pyx
+recursive-include chm *.pxi
+recursive-include chm *.pxd
+recursive-include chm *.h
