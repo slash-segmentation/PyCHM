@@ -464,13 +464,14 @@ def next_regular(target):
 
 
 ########## Calculating Accuracy ##########
-def calc_confusion_matrix(predicted, ground_truth):
+def calc_confusion_matrix(predicted, ground_truth, mask=None):
     """
     Calculate the values of the confusion matrix, returning true positives, true negatives, false
     positives, and false negatives comparing the results of the predicated and ground_truth images.
     The arguments should be ImageStacks or lists of images. Each image is passed to ensure_binary
     to make sure it is a boolean image type. If this is not desired make sure to process the images
-    first making sure they are already a boolean image type.
+    first making sure they are already a boolean image type. If provided, only the pixels under the
+    given mask will be considered.
     """
     from itertools import izip
     from pysegtools.images import ImageStack
@@ -479,8 +480,15 @@ def calc_confusion_matrix(predicted, ground_truth):
     ground_truth = ImageStack.as_image_stack(ground_truth)
     if len(predicted) != len(ground_truth):
         raise ValueError("Not the same number of images in predicted and ground-truth sets")
-    for p,gt in izip(predicted, ground_truth):
+    if mask is None: mask = [None]*len(predicted)
+    elif len(mask) != len(predicted):
+        raise ValueError("Not the same number of images in the mask")
+    for p,gt,m in izip(predicted, ground_truth, mask):
         p,gt = ensure_binary(p.data),ensure_binary(gt.data)
+        if m is not None:
+            # Apply mask
+            m = ensure_binary(m.data)
+            p,gt = p[m],gt[m]
         _p,_gt = ~p,~gt
         TP += int(( p &  gt).sum())
         TN += int((_p & _gt).sum())
